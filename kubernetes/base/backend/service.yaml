@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  # Using 'backend' is simpler for service discovery (http://backend:8080).
+  name: backend
+  labels:
+    app: backend
+spec:
+  # This selector must exactly match the 'app: backend' label on the Pods.
+  selector:
+    app: backend
+    
+  # NodePort makes the service accessible on a static port on every cluster node.
+  # This is good for development or when you don't have an Ingress Controller.
+  type: ClusterIP
+  
+  ports:
+    - protocol: TCP
+      # The port the service is exposed on INSIDE the cluster (e.g., http://backend:8080)
+      port: 8080
+      # The port on the Pod that traffic should be sent to.
+      targetPort: 8080
+      # The static port on the physical node (e.g., http://<node-ip>:30081).
+  

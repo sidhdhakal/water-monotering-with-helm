@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: frontend
+          image: siddhartha54/water-quality-monitoring-frontend:latest
+          env:
+            - name: ENVIRONMENT
+              value: "dev"

@@ -1,0 +1,55 @@
+# myapp-chart/values.yaml
+# ---
+# Default values for myapp-chart.
+# This is the "development" configuration.
+# It's intended to be lightweight and easy to deploy.
+
+# --- Frontend Subchart Values ---
+frontend:
+  replicaCount: 1
+
+  image:
+    repository: siddhartha54/water-quality-monitoring-frontend
+    tag: "latest" # Development tag
+
+  service:
+    type: NodePort # Easy to access during development
+
+  # The React App needs to know the backend's URL.
+  # The service name will be constructed by Helm like: <release-name>-<chart-name>
+  # Example: 'my-release-backend'
+  env:
+    REACT_APP_API_URL: "http://{{ .Release.Name }}-backend:8080/api"
+
+
+# --- Backend Subchart Values ---
+backend:
+  replicaCount: 1
+
+  image:
+    repository: siddhartha54/water-quality-monitoring-backend
+    tag: "latest" # Development tag
+
+  service:
+    type: ClusterIP # No need for a LoadBalancer in dev
+
+  # The backend needs the database URL.
+  # The MySQL service name will be: <release-name>-mysql
+  env:
+    SPRING_DATASOURCE_URL: "jdbc:mysql://{{ .Release.Name }}-mysql:3306/wqm"
+
+
+# --- MySQL Subchart Values ---
+mysql:
+  # IMPORTANT: For development, we disable persistence to avoid storage setup issues.
+  # The database will be ephemeral.
+  persistence:
+    enabled: false
+
+  # You can define default credentials here, but it's better to use --set or a separate values file
+  # for secrets. Example from a standard MySQL chart:
+  # auth:
+  #   rootPassword: "dev-root-password"
+  #   database: "wqm"
+  #   username: "dev-user"
+  #   password: "dev-password"

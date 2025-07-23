@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# This tells Kustomize to apply the "wqm" namespace to all resources
+# built from this base, including everything in frontend, backend, and mysql.
+namespace: wqm
+
+resources:
+  - namespace.yaml  # First, create the namespace itself
+  - ./frontend      # Then, include all resources from the frontend directory
+  - ./backend       # Include all resources from the backend directory
+  - ./mysql         # Include all resources from the mysql directory

@@ -1,0 +1,48 @@
+replicaCount: 1
+
+image:
+  repository: siddhartha54/water-quality-monitoring-backend
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 8080
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8080
+
+env:
+  SPRING_DATASOURCE_URL: "jdbc:mysql://myapp-mysql:3306/wqm"
+  SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.MySQLDialect"
+
+# This tells the deployment which secret to use for the password.
+secretName: "mysql-credentials"
+
+# The rest of the file (serviceAccount, resources, etc.) can be default.
+serviceAccount:
+  create: true
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+ingress:
+  enabled: false
+resources: {}
+autoscaling:
+  enabled: false
+volumes: []
+volumeMounts: []
+nodeSelector: {}
+tolerations: []
+affinity: {}

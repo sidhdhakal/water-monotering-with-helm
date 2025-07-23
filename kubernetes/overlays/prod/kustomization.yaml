@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+  - secret.yaml
+
+patches:
+  - path: frontend-patch.yaml
+  - path: backend-patch.yaml
+  - path: mysql-patch.yaml
+
+namespace: water-quality-prod

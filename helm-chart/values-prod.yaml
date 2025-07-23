@@ -1,0 +1,33 @@
+# myapp-chart/values-prod.yaml
+# ---
+# Production override values for myapp-chart.
+# Use this file with `helm install <name> . -f values-prod.yaml`
+
+# --- Frontend Subchart Values ---
+frontend:
+  replicaCount: 3
+
+  image:
+    tag: "prod-latest" # Use the stable production image
+
+
+# --- Backend Subchart Values ---
+backend:
+  replicaCount: 3
+
+  image:
+    tag: "prod-latest" # Use the stable production image
+
+  service:
+    type: LoadBalancer # Expose the backend to the internet for production
+
+
+# --- MySQL Subchart Values ---
+mysql:
+  # IMPORTANT: In production, persistence MUST be enabled.
+  persistence:
+    enabled: true
+    # You must configure this to match your cloud provider's available StorageClasses
+    # (e.g., "gp2", "standard", "managed-premium").
+    storageClass: "standard"
+    size: 10Gi # Set a reasonable size for your database volume

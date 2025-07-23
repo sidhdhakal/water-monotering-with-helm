@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # The name must match the resource in the base you are patching.
+  name: mysql
+spec:
+  template:
+    spec:
+      containers:
+        # The name must match the container in the base.
+        - name: mysql
+          # This section adds resource limits and requests, which is a perfect
+          # use-case for an overlay. Dev might have smaller values than Prod.
+          resources:
+            limits:
+              cpu: "1"      # 1 full CPU core
+              memory: "1Gi" # 1 Gibibyte of RAM
+            requests:
+              cpu: "500m"   # 0.5 CPU cores
+              memory: "512Mi" # 512 Mebibytes of RAM
+          
+          # This is the corrected 'env' section.
+          env:
+            # We are patching the 'MYSQL_ROOT_PASSWORD' variable.
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  # This must match the name of the Secret in this overlay.
+                  name: mysql-secret
+                  # This must match the key within the Secret's data.
+                  key: password
+                  
+            # IMPORTANT: You must also re-state any other env vars from the base
+            # because a patch on a list replaces the whole list.
+            - name: MYSQL_DATABASE
+              value: wqm
