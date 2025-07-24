@@ -1,33 +1,40 @@
-# myapp-chart/values-prod.yaml
-# ---
-# Production override values for myapp-chart.
-# Use this file with `helm install <name> . -f values-prod.yaml`
+# water-quality-monitoring/values.yaml
 
-# --- Frontend Subchart Values ---
 frontend:
   replicaCount: 3
-
   image:
-    tag: "prod-latest" # Use the stable production image
+    repository: siddhartha54/water-quality-monitoring-frontend
+    tag: "latest"
+  service:
+    type: NodePort
+    port: 80
+  env:
+    # This is for the React app in the browser
+    REACT_APP_API_URL: "http://water-quality-monitoring-backend:8080/api"
+    # This is for the Nginx proxy inside the container.
+    # We are telling Nginx where the backend service is located.
+    BACKEND_HOST: "water-quality-monitoring-backend"
+    BACKEND_PORT: "8080"
 
-
-# --- Backend Subchart Values ---
 backend:
   replicaCount: 3
-
   image:
-    tag: "prod-latest" # Use the stable production image
-
+    repository: siddhartha54/water-quality-monitoring-backend
+    tag: "latest"
   service:
-    type: LoadBalancer # Expose the backend to the internet for production
-
-
-# --- MySQL Subchart Values ---
+    type: NodePort
+    port: 8080
+  env:
+    # Use standard Spring Boot environment variables for clarity and reliability
+    SPRING_DATASOURCE_URL: "jdbc:mysql://water-quality-monitoring-mysql:3306/waterdb?allowPublicKeyRetrieval=true"
+    SPRING_DATASOURCE_USERNAME: "root"
+    SPRING_DATASOURCE_PASSWORD: "password"
+    SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.MySQLDialect"
+    
 mysql:
-  # IMPORTANT: In production, persistence MUST be enabled.
-  persistence:
-    enabled: true
-    # You must configure this to match your cloud provider's available StorageClasses
-    # (e.g., "gp2", "standard", "managed-premium").
-    storageClass: "standard"
-    size: 10Gi # Set a reasonable size for your database volume
+  auth:
+    rootPassword: password
+    database: waterdb
+  primary:
+    service:
+      port: 3306
