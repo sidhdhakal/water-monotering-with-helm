@@ -1,0 +1,12 @@
+dependencies:
+- name: frontend
+  repository: file://charts/frontend
+  version: 0.1.0
+- name: backend
+  repository: file://charts/backend
+  version: 0.1.0
+- name: mysql
+  repository: https://charts.bitnami.com/bitnami
+  version: 9.10.6
+digest: sha256:961613f002870e444ce354fdbd3e6fe4958677f96a8f65804ea3f05c37d1c5c9
+generated: "2025-07-24T18:37:55.136243504+05:45"

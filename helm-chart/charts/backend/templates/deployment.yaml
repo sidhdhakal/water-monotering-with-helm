@@ -1,3 +1,4 @@
+# helm-chart/charts/backend/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,7 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "backend.labels" . | nindent 8 }}
+        {{- include "backend.selectorLabels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -32,6 +33,13 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      # --- START: THE BULLETPROOF INIT CONTAINER ---
+      initContainers:
+        - name: wait-for-mysql
+          image: alpine:latest # Using alpine which has the 'nc' command
+          # This command waits until it can successfully connect to the MySQL port
+          command: ["sh", "-c", "until nc -z -w 2 water-quality-monitoring-mysql 3306; do echo 'Waiting for mysql port...'; sleep 2; done;"]
+      # --- END: THE BULLETPROOF INIT CONTAINER ---
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
@@ -40,29 +48,17 @@ spec:
           {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          # --- CHANGE 1: Inject environment variables from values.yaml and the secret ---
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- with .Values.env }}
           env:
-            # This injects the SPRING_DATASOURCE_URL from values.yaml
-            {{- range $key, $value := .Values.env }}
+            {{- range $key, $value := . }}
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
-            # Spring Boot needs these specific variable names
-            - name: SPRING_DATASOURCE_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secretName }}
-                  key: MYSQL_USER
-            - name: SPRING_DATASOURCE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secretName }}
-                  key: MYSQL_PASSWORD
-          ports:
-            - name: http
-              # --- CHANGE 2: Set containerPort to the correct application port ---
-              containerPort: {{ .Values.service.targetPort }}
-              protocol: TCP
+          {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}

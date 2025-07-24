@@ -1,55 +1,40 @@
-# myapp-chart/values.yaml
-# ---
-# Default values for myapp-chart.
-# This is the "development" configuration.
-# It's intended to be lightweight and easy to deploy.
+# water-quality-monitoring/values.yaml
 
-# --- Frontend Subchart Values ---
 frontend:
   replicaCount: 1
-
   image:
     repository: siddhartha54/water-quality-monitoring-frontend
-    tag: "latest" # Development tag
-
+    tag: "latest"
   service:
-    type: NodePort # Easy to access during development
-
-  # The React App needs to know the backend's URL.
-  # The service name will be constructed by Helm like: <release-name>-<chart-name>
-  # Example: 'my-release-backend'
+    type: NodePort
+    port: 80
   env:
-    REACT_APP_API_URL: "http://{{ .Release.Name }}-backend:8080/api"
+    # This is for the React app in the browser
+    REACT_APP_API_URL: "http://water-quality-monitoring-backend:8080/api"
+    # This is for the Nginx proxy inside the container.
+    # We are telling Nginx where the backend service is located.
+    BACKEND_HOST: "water-quality-monitoring-backend"
+    BACKEND_PORT: "8080"
 
-
-# --- Backend Subchart Values ---
 backend:
   replicaCount: 1
-
   image:
     repository: siddhartha54/water-quality-monitoring-backend
-    tag: "latest" # Development tag
-
+    tag: "latest"
   service:
-    type: ClusterIP # No need for a LoadBalancer in dev
-
-  # The backend needs the database URL.
-  # The MySQL service name will be: <release-name>-mysql
+    type: NodePort
+    port: 8080
   env:
-    SPRING_DATASOURCE_URL: "jdbc:mysql://{{ .Release.Name }}-mysql:3306/wqm"
-
-
-# --- MySQL Subchart Values ---
+    # Use standard Spring Boot environment variables for clarity and reliability
+    SPRING_DATASOURCE_URL: "jdbc:mysql://water-quality-monitoring-mysql:3306/waterdb?allowPublicKeyRetrieval=true"
+    SPRING_DATASOURCE_USERNAME: "root"
+    SPRING_DATASOURCE_PASSWORD: "password"
+    SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.MySQLDialect"
+    
 mysql:
-  # IMPORTANT: For development, we disable persistence to avoid storage setup issues.
-  # The database will be ephemeral.
-  persistence:
-    enabled: false
-
-  # You can define default credentials here, but it's better to use --set or a separate values file
-  # for secrets. Example from a standard MySQL chart:
-  # auth:
-  #   rootPassword: "dev-root-password"
-  #   database: "wqm"
-  #   username: "dev-user"
-  #   password: "dev-password"
+  auth:
+    rootPassword: password
+    database: waterdb
+  primary:
+    service:
+      port: 3306
