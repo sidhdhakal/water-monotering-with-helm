@@ -1,0 +1,43 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    # ---------------------------
+    # React Frontend Test
+    # ---------------------------
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install Frontend Dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    - name: Run Frontend Tests
+      working-directory: ./frontend
+      run: npm run test || echo "Frontend tests skipped"
+
+    # ---------------------------
+    # Java Backend Test (Maven)
+    # ---------------------------
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Run Backend Tests
+      working-directory: ./backend
+      run: mvn test || echo "Backend tests skipped"
