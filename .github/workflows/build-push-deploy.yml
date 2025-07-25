@@ -53,8 +53,8 @@ jobs:
       run: |
         # Use the correct file extension '.yml' as per your file name
         # Use a more robust sed command that finds the repository line, then modifies the tag on the NEXT line
-        sed -i -E '/repository: siddhartha54\/water-quality-monitoring-frontend/!b;n;s/tag: .*/tag: "${{ steps.tag_generator.outputs.TAG }}"/' helm-chart/values-prod.yml
-        sed -i -E '/repository: siddhartha54\/water-quality-monitoring-backend/!b;n;s/tag: .*/tag: "${{ steps.tag_generator.outputs.TAG }}"/' helm-chart/values-prod.yml
+        sed -i -E '/repository: siddhartha54\/water-quality-monitoring-frontend/!b;n;s/tag: .*/tag: "${{ steps.tag_generator.outputs.TAG }}"/' helm-chart/values-prod.yaml
+        sed -i -E '/repository: siddhartha54\/water-quality-monitoring-backend/!b;n;s/tag: .*/tag: "${{ steps.tag_generator.outputs.TAG }}"/' helm-chart/values-prod.yaml
         
         echo "Updated helm-chart/values-prod.yml with tag: ${{ steps.tag_generator.outputs.TAG }}"
         # Print the file contents to the log for verification
@@ -66,7 +66,7 @@ jobs:
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         
         # Use the correct file name and add it only once
-        git add helm-chart/values-prod.yml
+        git add helm-chart/values-prod.yaml
 
         # Commit and push only if there are actual changes to the file
         if ! git diff-index --quiet HEAD; then
