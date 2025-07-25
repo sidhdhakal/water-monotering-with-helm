@@ -56,9 +56,9 @@ jobs:
         sed -i -E '/repository: siddhartha54\/water-quality-monitoring-frontend/!b;n;s/tag: .*/tag: "${{ steps.tag_generator.outputs.TAG }}"/' helm-chart/values-prod.yaml
         sed -i -E '/repository: siddhartha54\/water-quality-monitoring-backend/!b;n;s/tag: .*/tag: "${{ steps.tag_generator.outputs.TAG }}"/' helm-chart/values-prod.yaml
         
-        echo "Updated helm-chart/values-prod.yml with tag: ${{ steps.tag_generator.outputs.TAG }}"
+        echo "Updated helm-chart/values-prod.ymal with tag: ${{ steps.tag_generator.outputs.TAG }}"
         # Print the file contents to the log for verification
-        cat helm-chart/values-prod.yml
+        cat helm-chart/values-prod.yaml
 
     - name: Commit and Push updated deployment YAML
       run: |
