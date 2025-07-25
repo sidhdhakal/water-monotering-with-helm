@@ -4,7 +4,7 @@ frontend:
   replicaCount: 3
   image:
     repository: siddhartha54/water-quality-monitoring-frontend
-    tag: "latest"
+    tag: "48"
   service:
     type: NodePort
     port: 80
@@ -20,7 +20,7 @@ backend:
   replicaCount: 3
   image:
     repository: siddhartha54/water-quality-monitoring-backend
-    tag: "latest"
+    tag: "48"
   service:
     type: NodePort
     port: 8080
